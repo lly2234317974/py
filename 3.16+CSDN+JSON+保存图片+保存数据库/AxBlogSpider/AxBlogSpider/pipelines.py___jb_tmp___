@@ -1,0 +1,89 @@
+# -*- coding: utf-8 -*-
+
+# Define your item pipelines here
+#
+# Don't forget to add your pipeline to the ITEM_PIPELINES setting
+# See: https://doc.scrapy.org/en/latest/topics/item-pipeline.html
+# import MySQLdb
+import xlwt,json,codecs,os
+from scrapy.pipelines.images import ImagesPipeline
+from scrapy import Request
+class AxblogspiderPipeline(object):
+    def process_item(self, item, spider):
+        return item
+
+
+
+# class MSQblogspiderPipeline(object):
+#     def __init__(self):
+#         self.connect=MySQLdb.connect(host='localhost',port=3306,user='root',passwd='123456',db='csdn',charset='utf8')
+#         self.cursor=self.connect.cursor()
+#     def process_item(self,item,spider):
+#         insert_sql='insert into cs_table(first_name,title,date,click_num,src)VALUES ("%s","%s","%s","%s","%s") '%(item['first_name'],item['title'],item['date'],item['click_num'],item['src'])
+#         self.cursor.execute(insert_sql)
+#         self.connect.commit()
+#         return item
+#     def __del__(self):
+#         # 当对象从内存中清空时，会执行该函数
+#         # 关闭数据库，关闭游标
+#         self.cursor.close()
+#         self.connect.close()
+
+
+
+# class EXblogsspiderPipeline(object):
+#     def __init__(self):
+#         self.workbook=xlwt.Workbook(encoding='utf-8')
+#         self.sheet=self.workbook.add_sheet('信息')
+#         self.sheet.write(0,0,'first_name')
+#         self.sheet.write(0,1,'title')
+#         self.sheet.write(0,2,'date')
+#         self.sheet.write(0,3,'click_num')
+#         self.sheet.write(0,4,'src')
+#         self.count=1
+#     def process_item(self,item,spider):
+#         self.sheet.write(self.count,0,item['first_name'])
+#         self.sheet.write(self.count,1,item['title'])
+#         self.sheet.write(self.count,2,item['date'])
+#         self.sheet.write(self.count,3,item['click_num'])
+#         self.sheet.write(self.count,4,item['src'])
+#         self.count+=1
+#         # self.workbook.save('csdn.xls')
+#
+#         return item
+#     def close_spider(self,spider):
+#         self.workbook.save('csdn.xls')
+
+# class JsonblogspiderPipeline(object):
+#     def __init__(self):
+#         self.file=codecs.open('csdn.json','w',encoding='utf-8')
+#         self.file.write('[')
+#     def process_item(self,item,spider):
+#         item=dict(item)
+#         json_str=json.dumps(item)+','
+#         self.file.write(json_str)
+#         return item
+#     def close_spider(self,soider):
+#         self.file.seek(-1,os.SEEK_END)
+#         self.file.truncate()
+#         self.file.write(']')
+#
+#         self.file.close()
+
+class TPblogspiderPipeline(ImagesPipeline):
+    def get_media_requests(self, item, info):
+        result=[]
+        for sr in item['src']:
+            req=Request(url=sr,meta={'item':item})
+            result.append(req)
+        return result
+
+    def file_path(self, request, response=None, info=None):
+
+        first_name=request.meta['item']['first_name']
+        path='datas/'+first_name+'/'+first_name+'.jpg'
+        return path
+
+
+
+
